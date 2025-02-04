@@ -3,6 +3,6 @@ export type Recipe = {
     title: string;
     ingredients: string[];
     category: string;
-    creationDate: Date;
+    date: Date;
     rating: number;
 };

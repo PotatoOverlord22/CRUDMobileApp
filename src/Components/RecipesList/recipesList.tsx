@@ -1,5 +1,5 @@
-import { addEventListener } from "@react-native-community/netinfo";
-import { useNavigation } from "@react-navigation/native";
+import { addEventListener, NetInfoState } from "@react-native-community/netinfo";
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import React from "react";
 import { ScrollView, View } from "react-native";
 import { ActivityIndicator, Button, FAB, IconButton, List, Text } from "react-native-paper";
@@ -8,8 +8,10 @@ import { ToastMethods, ToastOptions } from "react-native-paper-toast/dist/typesc
 import { ConnectionStates } from "../../Library/Enums/ConnectionStates";
 import { InternalRoutes } from "../../Library/Enums/InternalRoutes";
 import { Sources } from "../../Library/Enums/Sources";
-import { NO_INTERNET_MESSAGE, RETRY } from "../../Library/generalConstants";
+import { ViewModes } from "../../Library/Enums/ViewModes";
+import { NO_INTERNET_MESSAGE, RETRY, usingCachedDataNotification } from "../../Library/generalConstants";
 import { StackNavigatorType } from "../../Library/routeParams";
+import { } from "../../Library/toastConstants";
 import { getErrorNotificationOptions, getSuccessNotificationOptions } from "../../Library/Utils/toastUtils";
 import { CustomResponse } from "../../Models/CustomResponse";
 import { Recipe } from "../../Models/Recipe";
@@ -30,15 +32,25 @@ export const RecipesList: React.FC = (): JSX.Element => {
     const [connectionStatus, setConnectionStatus] = React.useState<ConnectionStates>(ConnectionStates.OFFLINE);
 
     React.useEffect((): void => {
-        const unsubscribe = addEventListener((state): void => {
-            console.log("connection change: ", state.isConnected);
-            fetchRecipes();
+        addEventListener((state: NetInfoState): void => {
+            // ROMANEASCA
+            setConnectionStatus((prevStatus: ConnectionStates): ConnectionStates => {
+                if (state.isConnected && prevStatus === ConnectionStates.OFFLINE) {
+                    return prevStatus;
+                }
+                fetchRecipes();
+                return prevStatus;
+            });
         });
+
+        fetchRecipes();
     }, []);
 
-    React.useEffect((): void => {
-        console.log("connectionStatus", connectionStatus);
-    }, [connectionStatus]);
+    useFocusEffect(
+        React.useCallback(() => {
+            fetchRecipes();
+        }, [])
+    );
 
     const fetchRecipes = async (): Promise<void> => {
         setIsLoading(true);
@@ -46,10 +58,10 @@ export const RecipesList: React.FC = (): JSX.Element => {
             const serviceResponse: CustomResponse<Recipe[]> = await services.RecipeService.GetAll();
             if (serviceResponse.source === Sources.NETWORK) {
                 setConnectionStatus(ConnectionStates.ONLINE);
-                toaster.show(fetchRecipesSuccessNotification);
+                // toaster.show(fetchRecipesSuccessNotification);
             }
             else if (serviceResponse.source === Sources.LOCAL) {
-                toaster.show(getErrorNotificationOptions("No internet connection, showing cached data."));
+                toaster.show(usingCachedDataNotification);
                 setConnectionStatus(ConnectionStates.LOCAL);
             }
 
@@ -65,15 +77,15 @@ export const RecipesList: React.FC = (): JSX.Element => {
     };
 
     const onCreate = (): void => {
-        navigator.navigate(InternalRoutes.RecipeEdit, { isEditing: false });
+        navigator.navigate(InternalRoutes.RecipeEdit, { viewMode: ViewModes.CREATE });
     };
 
     const onViewDetails = (recipe: Recipe): void => {
-        navigator.navigate(InternalRoutes.RecipeDetails, { recipe });
+        navigator.navigate(InternalRoutes.RecipeEdit, { recipeId: recipe.id, viewMode: ViewModes.VIEW });
     };
 
     const onEdit = (recipe: Recipe): void => {
-        navigator.navigate(InternalRoutes.RecipeEdit, { recipe, isEditing: true });
+        navigator.navigate(InternalRoutes.RecipeEdit, { recipeId: recipe.id, viewMode: ViewModes.EDIT });
     };
 
     const onDelete = async (recipe: Recipe): Promise<void> => {

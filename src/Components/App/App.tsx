@@ -3,10 +3,11 @@ import merge from 'deepmerge';
 import { useColorScheme } from 'react-native';
 import { MD3DarkTheme as PaperDarkTheme, DefaultTheme as PaperDefaultTheme, PaperProvider } from 'react-native-paper';
 import { en, registerTranslation } from 'react-native-paper-dates';
-import { SafeAreaProvider } from 'react-native-safe-area-context';
-import { ServicesProvider } from '../../Providers/servicesProvider';
-import { ParentStackNavigator } from '../Navigation/parentStackNavigator';
 import { ToastProvider } from 'react-native-paper-toast';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { IP_ADDRESS, PORT } from '../../Library/generalConstants';
+import { ServicesProvider } from '../../Providers/servicesProvider';
+import { Root } from '../Root/root';
 
 registerTranslation('en', en);
 
@@ -23,7 +24,7 @@ export default function App() {
                 <NavigationContainer theme={theme}>
                     <ToastProvider>
                         <ServicesProvider>
-                            <ParentStackNavigator />
+                            <Root />
                         </ServicesProvider>
                     </ToastProvider>
                 </NavigationContainer>

@@ -1,11 +1,9 @@
 import axios, { AxiosResponse } from "axios";
 import { Sources } from "../Library/Enums/Sources";
+import { IP_ADDRESS, PORT } from "../Library/generalConstants";
 import { CustomResponse } from "../Models/CustomResponse";
 import { Recipe } from "../Models/Recipe";
 import { LocalDatabase } from "../Repositories/localDatabase";
-
-const IP_ADDRESS: string = "192.168.16.115";
-const PORT: number = 2528;
 
 export class RecipeService {
     private readonly _baseUrl: string = `http://${IP_ADDRESS}:${PORT}`;
@@ -19,9 +17,9 @@ export class RecipeService {
         try {
             const response: AxiosResponse<Recipe[]> = await axios.get(`${this._baseUrl}/recipes`);
 
-            response.data.forEach(async (recipe: Recipe) => {
+            await Promise.all(response.data.map(async (recipe) => {
                 await this.localDatabase.AddOrUpdateRecipe(this.mapRecipe(recipe));
-            });
+            }));
 
             return {
                 data: this.mapRecipeIngredients(response.data),
@@ -29,11 +27,11 @@ export class RecipeService {
             };
         }
         catch (error) {
-            console.error('Network request failed, falling back to local database:', error);
+            console.log('Network request failed, falling back to local database:', error);
             const localRecipes: Recipe[] = await this.localDatabase.GetAll();
 
             if (localRecipes.length === 0) {
-                console.error('No recipes found in local database.');
+                console.log('No recipes found in local database.');
                 throw new Error('No recipes found in local database.');
             }
 
@@ -54,11 +52,11 @@ export class RecipeService {
             }
         }
         catch (error) {
-            console.error('Network request failed, falling back to local database:', error);
+            console.log('Network request failed, falling back to local database:', error);
             const localRecipe: Recipe | null = await this.localDatabase.Get(id);
 
             if (!localRecipe) {
-                console.error('Recipe not found in local database.');
+                console.log('Recipe not found in local database.');
                 throw new Error('Recipe not found in local database.');
             }
 
@@ -70,17 +68,29 @@ export class RecipeService {
     }
 
     public async Create(recipe: Recipe): Promise<Recipe> {
-        const response = await axios.post<Recipe>(`${this._baseUrl}/recipe`, recipe);
+        const networkRecipe: any = {
+            ...recipe,
+            date: recipe.date.toISOString(),
+            ingredients: Array.isArray(recipe.ingredients) ? recipe.ingredients.join(", ") : ""
+        };
+        const response = await axios.post<Recipe>(`${this._baseUrl}/recipe`, networkRecipe);
         return this.mapRecipe(response.data);
     }
 
     public async Update(recipe: Recipe): Promise<Recipe> {
-        const response = await axios.put<Recipe>(`${this._baseUrl}/recipe/${recipe.id}`, recipe);
+        const networkRecipe: any = {
+            ...recipe,
+            date: recipe.date.toISOString(),
+            ingredients: recipe.ingredients.join(", ")
+        };
+        console.log("network recipe: ", networkRecipe);
+        const response = await axios.put<Recipe>(`${this._baseUrl}/recipe/${recipe.id}`, networkRecipe);
         return this.mapRecipe(response.data);
     }
 
     public async Delete(id: number): Promise<void> {
         await axios.delete(`${this._baseUrl}/recipe/${id}`);
+        await this.localDatabase.Delete(id);
     }
 
     // MANAREALA CA MI-A FOST LENE SA SCHIMB CA recipe.ingredients e string si nu string[]
@@ -92,10 +102,11 @@ export class RecipeService {
     }
 
     // MANAREALA CA MI-A FOST LENE SA SCHIMB CA recipe.ingredients e string si nu string[]
-    private mapRecipe(recipe: Recipe): Recipe {
+    private mapRecipe(networkRecipe: any): Recipe {
         return {
-            ...recipe,
-            ingredients: (recipe.ingredients as unknown as string).split(", ")
+            ...networkRecipe,
+            date: new Date(networkRecipe.date),
+            ingredients: (networkRecipe.ingredients as unknown as string).split(", ")
         };
     }
 }

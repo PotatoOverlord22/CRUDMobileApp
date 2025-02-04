@@ -3,9 +3,15 @@ import { EdgeInsets } from "react-native-safe-area-context";
 
 export const CREATE_RECIPE: string = "Create Recipe";
 export const EDIT_RECIPE: string = "Edit Recipe";
+export const VIEW_RECIPE: string = "View Recipe details";
 export const SELECT_DATE: string = "Select creation date";
 export const SAVE: string = "Save";
 export const CANCEL: string = "Cancel";
+
+export const CREATE_SUCCESSFUL_MESSAGE: string = "Successfully created recipe";
+export const EDIT_SUCCESSFUL_MESSAGE: string = "Successfully edited recipe";
+export const SAVE_FAILED_MESSAGE: string = "Failed to save recipe";
+export const FETCH_FAILED_MESSAGE: string = "Failed to fetch recipe";
 
 export const getRecipeEditStyles = (insets: EdgeInsets) => StyleSheet.create({
     container: {

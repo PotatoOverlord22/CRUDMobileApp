@@ -1,7 +1,6 @@
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { InternalRoutes } from "../../Library/Enums/InternalRoutes";
 import { StackParamList } from "../../Library/routeParams";
-import { RecipeDetails } from "../RecipeDetails/recipeDetails";
 import { RecipeEdit } from "../RecipeEdit/recipeEdit";
 import { TabNavigator } from "./tabNavigator";
 
@@ -13,13 +12,6 @@ export const ParentStackNavigator: React.FC = (): JSX.Element => {
             <StackNavigator.Screen
                 name={InternalRoutes.TabNavigator}
                 component={TabNavigator}
-                options={{
-                    headerShown: false
-                }}
-            />
-            <StackNavigator.Screen
-                name={InternalRoutes.RecipeDetails}
-                component={RecipeDetails}
                 options={{
                     headerShown: false
                 }}
