@@ -8,6 +8,8 @@ export const EDIT_ICON: IconSource = "pencil";
 export const DELETE_ICON: IconSource = "delete";
 export const FETCH_RECIPES_ERROR_MESSAGE: string = "Failed to fetch recipes";
 export const FETCH_RECIPES_SUCCESS_MESSAGE: string = "Successfully fetched recipes";
+export const DELETE_RECIPE_SUCCESS_MESSAGE: string = "Successfully deleted recipe";
+export const DELETE_RECIPE_ERROR_MESSAGE: string = "Failed to deleted recipe";
 
 export const recipesStyles = StyleSheet.create({
     mainContainer: {
@@ -25,6 +27,12 @@ export const recipesStyles = StyleSheet.create({
     },
     activityIndicatorContainer: {
         flex: 1,
+        justifyContent: "center",
+        alignItems: "center"
+    },
+    noInternetContainer: {
+        flex: 1,
+        height: "100%",
         justifyContent: "center",
         alignItems: "center"
     }

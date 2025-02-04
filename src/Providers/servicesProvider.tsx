@@ -1,5 +1,6 @@
 import React, { createContext, useContext } from 'react';
 import { RecipeService } from '../Services/recipeService';
+import { LocalDatabase } from '../Repositories/localDatabase';
 
 export interface IServices {
     RecipeService: RecipeService;
@@ -17,7 +18,8 @@ export const useServices = () => {
 };
 
 export const ServicesProvider: React.FC<React.PropsWithChildren> = (props: React.PropsWithChildren) => {
-    const recipeService: RecipeService = new RecipeService();
+    const localDatabase: LocalDatabase = new LocalDatabase();
+    const recipeService: RecipeService = new RecipeService(localDatabase);
 
     return (
         <ServicesContext.Provider value={{ RecipeService: recipeService }}>
