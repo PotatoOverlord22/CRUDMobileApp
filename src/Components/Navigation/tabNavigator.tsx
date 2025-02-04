@@ -1,7 +1,8 @@
 import { createMaterialBottomTabNavigator } from 'react-native-paper/react-navigation';
 import { EdgeInsets, useSafeAreaInsets } from "react-native-safe-area-context";
 import { InternalRoutes } from '../../Library/Enums/InternalRoutes';
-import { Insights } from '../Insights/insightsScreen';
+import { Explore } from '../Explore/explore';
+import { Insights } from '../Insights/insights';
 import { RecipesList } from '../RecipesList/recipesList';
 
 const Tab = createMaterialBottomTabNavigator();
@@ -22,10 +23,17 @@ export const TabNavigator: React.FC = (): JSX.Element => {
             <Tab.Screen
                 name={InternalRoutes.Insights}
                 component={Insights}
-                tabBarVisible={false}
                 options={{
                     title: InternalRoutes.Insights,
                     tabBarIcon: "chart-bar",
+                }}
+            />
+            <Tab.Screen
+                name={InternalRoutes.Explore}
+                component={Explore}
+                options={{
+                    title: InternalRoutes.Explore,
+                    tabBarIcon: "magnify",
                 }}
             />
         </Tab.Navigator>

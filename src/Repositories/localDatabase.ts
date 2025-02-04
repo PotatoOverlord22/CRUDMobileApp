@@ -116,7 +116,7 @@ export class LocalDatabase {
                 console.log("Database does not exist, nothing to delete.");
             }
         } catch (error) {
-            console.error("Error deleting database:", error);
+            console.log("Error deleting database:", error);
         }
     };
 }

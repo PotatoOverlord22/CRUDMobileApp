@@ -3,4 +3,5 @@ export enum InternalRoutes {
     Recipes = "Recipes",
     RecipeEdit = "RecipeEdit",
     Insights = "Insights",
+    Explore = "Explore"
 };
